@@ -41,34 +41,68 @@
       <h3 class="md-title">Araç Listesi</h3>
       <br />
     </md-toolbar>
- <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>A KATI</th>
-            <th>B KATI</th>
-            <th>C KATI</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(car, id) in otopark[0]" :key="id">
-            <th scope="row">{{ car.id }}</th>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>A KATI</th>
+          <th>B KATI</th>
+          <th>C KATI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(car, id) in otopark[0]" :key="id">
+          <th scope="row">{{ car.id }}</th>
+          <!-- <td>{{ id + 1 }} BOŞ</td> -->
+          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
+ 
+        </tr>
 
-            <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-          </tr>
+        <tr v-for="car in otopark[1]" :key="car.id">
+          <th scope="row">{{ car.id }}</th>
 
-          <tr v-for="(car) in otopark[1]" :key="car.id">
+          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
+        </tr>
 
-            <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-          </tr>
+        <tr v-for="(car, id) in otopark[2]" :key="id">
+          <th scope="row">{{ car.id }}</th>
 
-          <tr v-for="(car, id) in otopark[2]" :key="id">
-            <th scope="row">{{ car.id }}</th>
+          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
+        </tr>
+      </tbody>
+    </table>
 
-            <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-          </tr>
-        </tbody>
-      </table>
+
+<table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>B KATI</th>
+          <th>C KATI</th>
+        </tr>
+      </thead>
+      <tbody>
+       
+
+        <tr v-for="car in otopark[1]" :key="car.id">
+          <th scope="row">{{ car.id }}</th>
+
+          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
+        </tr>
+
+        <tr v-for="(car, id) in otopark[2]" :key="id">
+          <th scope="row">{{ car.id }}</th>
+
+          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
     <br /><br /><br />
     <div class="md-layout-item">
       <md-toolbar class="md-primary">
@@ -76,17 +110,13 @@
       ><br />
       <md-field>
         <label for="font">Select the car to delete</label>
-        <md-select v-model="selected" name="font" id="font">
-          <md-option
-            v-for="(car, id) in otopark[0]" :key="id"
-            >{{ car.plate }}</md-option
-          >
-        
+        <md-select >
+          <md-option v-for="(car, id) in otopark[0]" :key="id">
+            {{ car.plate }} ({{ car.color }} - {{ car.brand }})
+          </md-option>
         </md-select>
       </md-field>
-      <md-button class="md-raised md-accent"
-        >ARACI LİSTEDEN ÇIKAR</md-button
-      >
+      <md-button class="md-raised md-accent">ARACI LİSTEDEN ÇIKAR</md-button>
     </div>
   </div>
 </template>
@@ -100,10 +130,12 @@ export default {
       plate: "",
       brand: "",
       color: "",
-      cars: [], 
+      cars: [],
       otopark: {
         0: [],
         1: [],
+        // 1: [{},{},{},{},{}],
+
         2: [],
       },
       floor: {
@@ -120,24 +152,7 @@ export default {
       this.deletedCarId = e.target.value;
     },
 
-    deleteCarById() {
-      if (this.carCount <= 5) {
-        console.log(this.deletedCarId);
-        this.floor.a = this.floor.a.splice(parseInt(this.deletedCarId), 1);
-        console.log(typeof this.deletedCarId);
-        // console.log(this.selected)
-      } else if (this.carCount > 5 && this.carCount <= 10) {
-        this.floor.b = this.floor.b.filter(
-          (car) => car.id != this.deletedCarId
-        );
-        console.log(this.floor.b);
-      } else if (this.carCount > 15) {
-        this.floor.c = this.floor.c.filter(
-          (car) => car.id != this.deletedCarId
-        );
-        console.log(this.floor.c);
-      }
-    },
+    deleteCarById() {},
 
     addCar() {
       if (this.plate && this.brand && this.color) {
@@ -164,23 +179,20 @@ export default {
             brand: this.brand,
             color: this.color,
           });
-
         } else {
           alert("OTOPARK DOLU");
         }
       } else {
         alert("Inputlar bos birakilamaz!");
       }
-          console.log(this.otopark)
-
+      console.log(this.otopark);
     },
 
     clearData() {
-      this.color = ""
-      this.plate = ""
-      this.brand = ""
+      this.color = "";
+      this.plate = "";
+      this.brand = "";
     },
-    
   },
 };
 </script>
@@ -207,9 +219,13 @@ export default {
   margin-right: 100px;
 }
 
-
 .car-table {
   display: flex;
   justify-content: center;
+}
+
+table{
+  display: flex;
+  flex-direction: column;
 }
 </style>
