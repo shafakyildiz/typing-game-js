@@ -39,69 +39,34 @@
     <br /><br /><br />
     <md-toolbar class="md-primary">
       <h3 class="md-title">Araç Listesi</h3>
-      <br />
-    </md-toolbar>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>A KATI</th>
-          <th>B KATI</th>
-          <th>C KATI</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(car, id) in otopark[0]" :key="id">
-          <th scope="row">{{ car.id }}</th>
-          <!-- <td>{{ id + 1 }} BOŞ</td> -->
-          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
- 
-        </tr>
+      <br /> </md-toolbar
+    ><br />
 
-        <tr v-for="car in otopark[1]" :key="car.id">
-          <th scope="row">{{ car.id }}</th>
+    <!-- DIVS -->
+    <div class="container grid">
+      <div class="column">
+        <strong>ID</strong>
 
-          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-        </tr>
+        <ul>
+          <li v-for="index in floorlimit" :key="index">{{ index }}</li>
+        </ul>
+      </div>
 
-        <tr v-for="(car, id) in otopark[2]" :key="id">
-          <th scope="row">{{ car.id }}</th>
+      <div class="column" v-for="f in capacity / floorlimit" :key="'A' + f">
+        <strong>{{ floornames[f - 1] }} KATI</strong>
 
-          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-        </tr>
-      </tbody>
-    </table>
+        <ul>
+          <li v-for="(k, index) in floorlimit" :key="index">
+            {{ otopark[f - 1][index].plate }} ({{
+              otopark[f - 1][index].color
+            }}
+            - {{ otopark[f - 1][index].brand }})
+          </li>
+        </ul>
 
-
-<table class="table table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>B KATI</th>
-          <th>C KATI</th>
-        </tr>
-      </thead>
-      <tbody>
-       
-
-        <tr v-for="car in otopark[1]" :key="car.id">
-          <th scope="row">{{ car.id }}</th>
-
-          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-        </tr>
-
-        <tr v-for="(car, id) in otopark[2]" :key="id">
-          <th scope="row">{{ car.id }}</th>
-
-          <td>{{ car.plate }} ({{ car.color }} - {{ car.brand }})</td>
-        </tr>
-      </tbody>
-    </table>
-
-
-
-
-
+        <div class="row"></div>
+      </div>
+    </div>
 
     <br /><br /><br />
     <div class="md-layout-item">
@@ -109,14 +74,29 @@
         <h3 class="md-title">Araç Silme Formu</h3> </md-toolbar
       ><br />
       <md-field>
-        <label for="font">Select the car to delete</label>
-        <md-select >
-          <md-option v-for="(car, id) in otopark[0]" :key="id">
-            {{ car.plate }} ({{ car.color }} - {{ car.brand }})
-          </md-option>
+        <md-select v-model="selected">
+          <md-option disabled value="">Select the car to delete</md-option>
+          <md-option :value="k" v-for="k in capacity" :key="k"
+            >{{
+              otopark[Math.floor(carCount / floorlimit)][(k - 1) % floorlimit]
+                .plate
+            }}
+            ({{
+              otopark[Math.floor(carCount / floorlimit)][(k - 1) % floorlimit]
+                .color
+            }}
+            -
+            {{
+              otopark[Math.floor(carCount / floorlimit)][(k - 1) % floorlimit]
+                .brand
+            }})</md-option
+          >
         </md-select>
       </md-field>
-      <md-button class="md-raised md-accent">ARACI LİSTEDEN ÇIKAR</md-button>
+
+      <md-button class="md-raised md-accent" @click="deleteCar"
+        >ARACI LİSTEDEN ÇIKAR
+      </md-button>
     </div>
   </div>
 </template>
@@ -126,66 +106,71 @@ export default {
   name: "App",
   data() {
     return {
-      selected: {},
+      capacity: 15,
+      floorlimit: 5,
+      floornames: "abcdefghijklmnopqrstuvwxyz".toUpperCase().split(""),
+      floors: this.capacity / this.floorlimit,
+      selected: "",
       plate: "",
       brand: "",
       color: "",
       cars: [],
-      otopark: {
-        0: [],
-        1: [],
-        // 1: [{},{},{},{},{}],
-
-        2: [],
-      },
-      floor: {
-        a: [],
-        b: [],
-        c: [],
-      },
+      otopark: [],
       carCount: 0,
       deletedCarId: 0,
     };
   },
   methods: {
-    selectId(e) {
-      this.deletedCarId = e.target.value;
+    first: function () {
+      let floors = Math.ceil(this.capacity / this.floorlimit);
+      console.log("Number of capacity:", this.capacity);
+      console.log("Number of floor limit:", this.floorlimit);
+      console.log("Number of floors:", floors);
+      for (let i = 0; i < floors; i++) {
+        this.otopark.push([]);
+        for (let j = 0; j < this.floorlimit; j++) {
+          this.otopark[i].push({
+            id: this.carCount,
+            plate: this.plate,
+            brand: this.brand,
+            color: this.color,
+          });
+        }
+      }
+      console.log("Otopark:", this.otopark);
     },
 
-    deleteCarById() {},
-
     addCar() {
-      if (this.plate && this.brand && this.color) {
-        this.carCount++;
+      if (this.carCount < this.capacity) {
+        console.log("The plate is: ", this.plate);
+        console.log("The color is: ", this.color);
+        console.log("The brand is: ", this.brand);
 
-        if (this.carCount <= 5) {
-          this.otopark[0].push({
+        if (this.plate && this.color && this.brand) {
+          console.log(
+            this.otopark[Math.floor(this.carCount / this.floorlimit)][
+              this.carCount % this.floorlimit
+            ]
+          );
+
+          this.otopark[Math.floor(this.carCount / this.floorlimit)][
+            this.carCount % this.floorlimit
+          ] = {
             id: this.carCount,
             plate: this.plate,
             brand: this.brand,
             color: this.color,
-          });
-        } else if (this.carCount > 5 && this.carCount <= 10) {
-          this.otopark[1].push({
-            id: this.carCount,
-            plate: this.plate,
-            brand: this.brand,
-            color: this.color,
-          });
-        } else if (this.carCount > 10 && this.carCount <= 15) {
-          this.otopark[2].push({
-            id: this.carCount,
-            plate: this.plate,
-            brand: this.brand,
-            color: this.color,
-          });
+          };
+
+          this.carCount++;
         } else {
-          alert("OTOPARK DOLU");
+          alert("INPUTLAR BOŞ BIRAKILAMAZ!");
         }
       } else {
-        alert("Inputlar bos birakilamaz!");
+        alert("OTOPARK DOLU!");
       }
-      console.log(this.otopark);
+      console.log("The car count is: ", this.carCount);
+      console.log("Otopark:", this.otopark);
     },
 
     clearData() {
@@ -193,6 +178,23 @@ export default {
       this.plate = "";
       this.brand = "";
     },
+    deleteCar() {
+      console.log(this.selected);
+      // months.splice(4, 1, 'May');
+      (this.otopark[Math.floor(this.carCount / this.floorlimit)][
+        (this.selected - 1) % this.floorlimit
+      ].plate = ""),
+        (this.otopark[Math.floor(this.carCount / this.floorlimit)][
+          (this.selected - 1) % this.floorlimit
+        ].color = ""),
+        (this.otopark[Math.floor(this.carCount / this.floorlimit)][
+          (this.selected - 1) % this.floorlimit
+        ].brand = "");
+      console.log("After deletion the otopark is: ", this.otopark);
+    },
+  },
+  beforeMount() {
+    this.first();
   },
 };
 </script>
@@ -206,7 +208,6 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-
 .car-register-form {
   display: flexbox;
   justify-content: center;
@@ -214,18 +215,42 @@ export default {
   align-items: flex-start;
   margin: 70px;
 }
-
 .md-ripple {
   margin-right: 100px;
 }
-
 .car-table {
   display: flex;
   justify-content: center;
 }
-
-table{
+* {
+  box-sizing: border-box;
+}
+/* Create a two-column layout */
+.column {
+  float: left;
+  width: 25%;
+  border: #2c3e50 5px solid;
+  padding: 5px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+ul {
+  list-style-type: none; /* Remove bullets */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margins */
+}
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+li {
+  border: aquamarine 5px solid;
+  padding: 5px;
 }
 </style>
